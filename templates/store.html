@@ -1,0 +1,6 @@
+<p>results: {{ results.number_found }}</p>
+<ul>
+    {% for result in results %}
+        <li>{{ result.doc_id }} / {{ result.fields[1]['value'] }} / {{ result.fields[0]['value'] }}</li>
+    {% endfor %}
+</ul>
