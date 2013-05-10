@@ -6,8 +6,12 @@
     <link rel="stylesheet" type="text/css" href="../static/annotorious/css/annotorious.css" />
 
     <script type="text/javascript" src="../static/annotorious/annotorious.min.js"></script>
-    <script type="text/javascript" src="http://localhost:9810/compile?id=main"></script>
-{#    <script type="text/javascript" src="static/main.js"></script>#}
+
+    {% if DEVEL_ENVIRONMENT %}
+        <script type="text/javascript" src="http://localhost:9810/compile?id=main"></script>
+    {% else %}
+        <script type="text/javascript" src="static/index.js"></script>
+    {% endif %}
 </head>
 <body>
     {% if user %}
@@ -23,10 +27,10 @@
             </p>
         </div>
 
+        <script type="text/javascript">kt_annotations.main.start();</script>
+
     {% else %}
         Hi. Please <a href="{{ url }}">Log in</a>.
     {% endif %}
-
-    <script type="text/javascript">kt_annotations.main.start();</script>
 </body>
 </html>

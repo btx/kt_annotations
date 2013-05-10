@@ -16,13 +16,16 @@ kt_annotations.main.load = function() {
         var annotations = e.target.getResponseJson();
 
         goog.array.forEach(annotations, function(annotation) {
-            anno.addAnnotation(annotation);
+            if (annotation.shapes) {
+                anno.addAnnotation(annotation);
+            }
         })
     });
 
     xhr.send('/annotations', 'GET', qd);
 };
 
+// TODO: update annotations only if store/update/delete action is successful?
 kt_annotations.main.store = function(annotation, callback) {
     var serializer = new goog.proto.Serializer(null);
     var qd = new goog.Uri.QueryData();

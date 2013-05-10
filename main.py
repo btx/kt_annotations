@@ -6,13 +6,30 @@ import webapp2
 from google.appengine.api import search, users
 
 
+DEVEL_ENVIRONMENT = os.environ['SERVER_SOFTWARE'].startswith('Development')
+
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__),
                                                 'templates')))
 _INDEX_NAME = "annotations"
 
 
-class HelloHandler(webapp2.RequestHandler):
+def user_required(handler):
+    """
+    Decorator that checks if there's a user associated with
+    the current session. Will also fail if there's no session present.
+    """
+    def check_login(self, *args, **kwargs):
+        if not users.get_current_user():
+            self.error(401)
+        else:
+            return handler(self, *args, **kwargs)
+
+    return check_login
+
+
+class HomeHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
 
@@ -25,6 +42,7 @@ class HelloHandler(webapp2.RequestHandler):
             'users': users,
             'user': user,
             'url': url,
+            'DEVEL_ENVIRONMENT': DEVEL_ENVIRONMENT,
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -48,6 +66,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
 
         return data
 
+    @user_required
     def get(self, annotation_id=None):
         query = ''
 
@@ -63,6 +82,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
         self.response.write(json.dumps(self._prepare(results)))
 
     # TODO: handle errors properly
+    @user_required
     def post(self):
         data = self.request.get('annotation')
 
@@ -98,6 +118,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(annotation))
 
+    @user_required
     def delete(self, annotation_id):
         index = search.Index(name=_INDEX_NAME)
         index.delete(annotation_id)
@@ -107,7 +128,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    webapp2.Route(r'/', HelloHandler, name='home'),
+    webapp2.Route(r'/', HomeHandler, name='home'),
     webapp2.Route(r'/annotations', AnnotationsHandler, name='annotation_list'),
     webapp2.Route(r'/annotations/<annotation_id:[-\w]+>', AnnotationsHandler,
                   name='annotation'),
