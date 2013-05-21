@@ -82,6 +82,26 @@ class SearchHandler(BaseHandler):
         self.response.write(template.render(self.context))
 
 
+class SearchPurgeHandler(webapp2.RequestHandler):
+    @user_required
+    def get(self):
+        doc_index = search.Index(name=_INDEX_NAME)
+
+        while True:
+            # Get a list of documents populating only the doc_id field
+            # and extract the ids.
+            document_ids = [document.doc_id
+                            for document in doc_index.get_range(ids_only=True)]
+
+            if not document_ids:
+                break
+
+            # Delete the documents for the given ids from the Index.
+            doc_index.delete(document_ids)
+
+        self.redirect('/search')
+
+
 class AnnotationsHandler(webapp2.RequestHandler):
     def _prepare(self, results):
         data = []
@@ -159,6 +179,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', HomeHandler, name='home'),
     webapp2.Route(r'/search', SearchHandler, name='search'),
+    webapp2.Route(r'/search/purge', SearchPurgeHandler, name='search_purge'),
     webapp2.Route(r'/annotations', AnnotationsHandler, name='annotation_list'),
     webapp2.Route(r'/annotations/<annotation_id:[-\w]+>', AnnotationsHandler,
                   name='annotation'),
