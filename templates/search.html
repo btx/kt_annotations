@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form>
+        <input type="text" name="q" value="{{ query_escaped }}"/>
+        <input type="submit" value="search"/>
+    </form>
+
+    <p>results: {{ results.number_found }}</p>
+
+    <ul>
+        {% for result in results %}
+            <li>
+                {{ result.fields[1]['value'] }} /
+                <b>{{ result.fields[0]['value'] }}</b>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

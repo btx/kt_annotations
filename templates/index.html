@@ -1,21 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>KT annotations</title>
+{% extends 'base.html' %}
 
-    <link rel="stylesheet" type="text/css" href="static/css/annotorious/annotorious.css" />
-
-    <script type="text/javascript" src="src/third_party/annotorious.latest.min.js"></script>
-    {% if DEVEL_ENVIRONMENT %}
-        <script type="text/javascript" src="http://localhost:9810/compile?id=main"></script>
-    {% else %}
-        <script type="text/javascript" src="src/main_compiled.js"></script>
-    {% endif %}
-</head>
-<body>
+{% block content %}
     {% if user %}
-        Hello {{ user }}. <a href="{{ url }}">Log out</a>.
-
         <div style="margin:20px 0;">
             <img src="static/img/img1.jpg" class="annotatable">
 
@@ -24,22 +10,16 @@
             </p>
         </div>
 
-{#
-        <div style="margin:20px 0;">
-            <img src="static/img2.jpg" class="annotatable">
+        {#
+            <div style="margin:20px 0;">
+                <img src="static/img2.jpg" class="annotatable">
 
-            <p class="image-caption">
-                Glacier Grey. By Zdenek Softic.
-            </p>
-        </div>
-#}
-
-
+                <p class="image-caption">
+                    Glacier Grey. By Zdenek Softic.
+                </p>
+            </div>
+        #}
 
         <script type="text/javascript">kt_annotations.start();</script>
-
-    {% else %}
-        Hi. Please <a href="{{ url }}">Log in</a>.
     {% endif %}
-</body>
-</html>
+{% endblock %}

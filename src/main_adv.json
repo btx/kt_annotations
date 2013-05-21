@@ -1,5 +1,5 @@
 {
-    "id": "main_adv",
+    "id": "main",
     "inherits": "main.json",
 
     "externs": [
@@ -14,7 +14,7 @@
 //        "accessControls": "OFF", // "ERROR"
 //        "visibility": "OFF", // "ERROR"
 
-        "checkTypes": "OFF",
+        "checkTypes": "ERROR", // "OFF"
         "checkRegExp": "ERROR",
         "checkVars": "ERROR",
         "deprecated": "ERROR",

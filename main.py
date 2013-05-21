@@ -1,3 +1,4 @@
+import cgi
 import json
 import jinja2
 import os
@@ -10,7 +11,7 @@ from google.appengine.api import search, users
 
 
 DEVEL_ENVIRONMENT = os.environ['SERVER_SOFTWARE'].startswith('Development')
-DEVEL_ENVIRONMENT = False
+# DEVEL_ENVIRONMENT = False
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__),
                                                 'templates')))
@@ -24,15 +25,16 @@ def user_required(handler):
     """
     def check_login(self, *args, **kwargs):
         if not users.get_current_user():
-            self.error(401)
+            # self.error(401
+            self.redirect(users.create_login_url(self.request.path))
         else:
             return handler(self, *args, **kwargs)
 
     return check_login
 
 
-class HomeHandler(webapp2.RequestHandler):
-    def get(self):
+class BaseHandler(webapp2.RequestHandler):
+    def dispatch(self, *args, **kwargs):
         user = users.get_current_user()
 
         if user:
@@ -40,15 +42,44 @@ class HomeHandler(webapp2.RequestHandler):
         else:
             url = users.create_login_url(self.request.uri)
 
-        context = {
+        self.context = {
             'users': users,
             'user': user,
             'url': url,
             'DEVEL_ENVIRONMENT': DEVEL_ENVIRONMENT,
         }
 
+        super(BaseHandler, self).dispatch(*args, **kwargs)
+
+
+class HomeHandler(BaseHandler):
+    def get(self):
         template = JINJA_ENVIRONMENT.get_template('index.html')
-        self.response.write(template.render(context))
+        self.response.write(template.render(self.context))
+
+
+class SearchHandler(BaseHandler):
+    @user_required
+    def get(self):
+        query = self.request.get('q', '')
+        query_escaped = cgi.escape(query, quote=True)
+
+        query_options = search.QueryOptions(
+            limit=1000,
+            # returned_fields=['doc_id', 'text', 'src'],
+            # snippeted_fields=['text'],
+        )
+        query_obj = search.Query(query_string=query, options=query_options)
+        results = search.Index(name=_INDEX_NAME).search(query=query_obj)
+
+        self.context.update({
+            'query': query,
+            'query_escaped': query_escaped,
+            'results': results,
+        })
+
+        template = JINJA_ENVIRONMENT.get_template('search.html')
+        self.response.write(template.render(self.context))
 
 
 class AnnotationsHandler(webapp2.RequestHandler):
@@ -83,18 +114,15 @@ class AnnotationsHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(self._prepare(results)))
 
-    # TODO: handle errors properly
     @user_required
     def post(self):
         data = self.request.get('annotation')
 
-        annotation = None
-
         try:
             annotation = json.loads(data)
         except ValueError:
-            # invalid input
-            pass
+            self.error(400)
+            self.response.write(json.dumps({'error': True}))
         else:
             doc = search.Document(
                 doc_id=annotation.get('id', None),
@@ -109,16 +137,15 @@ class AnnotationsHandler(webapp2.RequestHandler):
             )
 
             try:
-                # raise search.Error()
                 result = search.Index(name=_INDEX_NAME).put(doc)
             except search.Error:
-                # logging.exception('Put failed')
-                pass
+                self.error(400)
+                self.response.write(json.dumps({'error': True}))
             else:
                 annotation['id'] = result[0].id
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.write(json.dumps(annotation))
+                self.response.headers['Content-Type'] = 'application/json'
+                self.response.write(json.dumps(annotation))
 
     @user_required
     def delete(self, annotation_id):
@@ -131,6 +158,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     webapp2.Route(r'/', HomeHandler, name='home'),
+    webapp2.Route(r'/search', SearchHandler, name='search'),
     webapp2.Route(r'/annotations', AnnotationsHandler, name='annotation_list'),
     webapp2.Route(r'/annotations/<annotation_id:[-\w]+>', AnnotationsHandler,
                   name='annotation'),
