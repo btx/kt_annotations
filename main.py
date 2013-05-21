@@ -6,9 +6,11 @@ import webapp2
 from google.appengine.api import search, users
 
 
+# TODO: add comments - py + js
+
+
 DEVEL_ENVIRONMENT = os.environ['SERVER_SOFTWARE'].startswith('Development')
-
-
+DEVEL_ENVIRONMENT = False
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__),
                                                 'templates')))

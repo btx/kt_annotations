@@ -1,12 +1,9 @@
 {
-    "id": "main",
-    "paths": [],
-    "inputs": [
-        "main.js"
-    ]
-    /*,
+    "id": "main_adv",
+    "inherits": "main.json",
+
     "externs": [
-        "annotorious/annotorious.min.js"
+        "externs/annotorious.externs.js"
     ],
 
     "mode": "ADVANCED",
@@ -14,10 +11,10 @@
 
     "checks": {
         // Unfortunately, the Closure Library violates these in many places.
-        // "accessControls": "ERROR",
-        // "visibility": "ERROR"
+//        "accessControls": "OFF", // "ERROR"
+//        "visibility": "OFF", // "ERROR"
 
-        *//*"checkTypes": "ERROR",
+        "checkTypes": "OFF",
         "checkRegExp": "ERROR",
         "checkVars": "ERROR",
         "deprecated": "ERROR",
@@ -25,6 +22,6 @@
         "invalidCasts": "ERROR",
         "missingProperties": "ERROR",
         "nonStandardJsDocs": "ERROR",
-        "undefinedVars": "ERROR"*//*
-    }*/
+        "undefinedVars": "ERROR" // "OFF"
+    }
 }

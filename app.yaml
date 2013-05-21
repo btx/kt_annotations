@@ -13,6 +13,10 @@ handlers:
   static_dir: static
   upload:
 
+- url: /src
+  static_dir: src
+  upload:
+
 - url: .*
   script: main.app
 

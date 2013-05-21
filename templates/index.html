@@ -3,14 +3,13 @@
 <head>
     <title>KT annotations</title>
 
-    <link rel="stylesheet" type="text/css" href="../static/annotorious/css/annotorious.css" />
+    <link rel="stylesheet" type="text/css" href="static/css/annotorious/annotorious.css" />
 
-    <script type="text/javascript" src="../static/annotorious/annotorious.min.js"></script>
-
+    <script type="text/javascript" src="src/third_party/annotorious.latest.min.js"></script>
     {% if DEVEL_ENVIRONMENT %}
         <script type="text/javascript" src="http://localhost:9810/compile?id=main"></script>
     {% else %}
-        <script type="text/javascript" src="static/index.js"></script>
+        <script type="text/javascript" src="src/main_compiled.js"></script>
     {% endif %}
 </head>
 <body>
@@ -18,16 +17,26 @@
         Hello {{ user }}. <a href="{{ url }}">Log out</a>.
 
         <div style="margin:20px 0;">
-            <img src="../static/annotorious/Hallstatt.jpg" class="annotatable">
+            <img src="static/img/img1.jpg" class="annotatable">
 
             <p class="image-caption">
-                Hallstatt, Austria. By Nick Csakany, 2007. Public Domain. Source:
-                <a href="http://commons.wikimedia.org/wiki/File:Hallstatt_300.jpg">Wikimedia
-                    Commons</a>
+                Oslo. By Zdenek Softic.
             </p>
         </div>
 
-        <script type="text/javascript">kt_annotations.main.start();</script>
+{#
+        <div style="margin:20px 0;">
+            <img src="static/img2.jpg" class="annotatable">
+
+            <p class="image-caption">
+                Glacier Grey. By Zdenek Softic.
+            </p>
+        </div>
+#}
+
+
+
+        <script type="text/javascript">kt_annotations.start();</script>
 
     {% else %}
         Hi. Please <a href="{{ url }}">Log in</a>.
