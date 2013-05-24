@@ -21,7 +21,7 @@ _INDEX_NAME = "annotations"
 def user_required(handler):
     """
     Decorator that checks if there's a user associated with
-    the current session. Will also fail if there's no session present.
+    the current session. Will redirect to login if there's no session present.
     """
     def check_login(self, *args, **kwargs):
         if not users.get_current_user():
@@ -34,7 +34,7 @@ def user_required(handler):
 
 
 class BaseHandler(webapp2.RequestHandler):
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self):
         user = users.get_current_user()
 
         if user:
@@ -49,7 +49,7 @@ class BaseHandler(webapp2.RequestHandler):
             'DEVEL_ENVIRONMENT': DEVEL_ENVIRONMENT,
         }
 
-        super(BaseHandler, self).dispatch(*args, **kwargs)
+        super(BaseHandler, self).dispatch()
 
 
 class HomeHandler(BaseHandler):
@@ -120,7 +120,7 @@ class AnnotationsHandler(webapp2.RequestHandler):
         return data
 
     @user_required
-    def get(self, annotation_id=None):
+    def get(self):
         query = ''
 
         query_options = search.QueryOptions(

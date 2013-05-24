@@ -113,6 +113,7 @@ kt_annotations.start = function() {
 //    anno.makeAnnotatable(document.getElementById('img_1'));
 //    anno.makeAnnotatable(document.getElementsByTagName('img')[0]);
 //    anno.makeAnnotatable(document.getElementsByTagName('img')[1]);
+    // TODO: load on ready
     setTimeout(function() {
         kt_annotations.load();
     }, 500);
